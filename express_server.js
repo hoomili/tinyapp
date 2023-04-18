@@ -10,8 +10,13 @@ const urlDatabase = {
 };
 
 const generateRandomString = () => {
-  
-}
+  let randomString = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 6; i++) {
+    randomString += characters[Math.floor(Math.random()*characters.length)];
+  }
+  return randomString;
+};
 
 app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
