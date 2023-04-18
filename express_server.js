@@ -12,7 +12,7 @@ const urlDatabase = {
 const generateRandomString = () => {
   let randomString = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     randomString += characters[Math.floor(Math.random()*characters.length)];
   }
   return randomString;
