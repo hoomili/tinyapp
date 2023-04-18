@@ -44,23 +44,24 @@ app.post('/urls', (req, res) => {
   console.log(req.body);
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
-  console.log(urlDatabase);
+  // console.log(urlDatabase);
   res.redirect(`/urls/${id}`);
 });
 app.post('/urls/:id/delete', (req, res) => {
-  console.log('what i get', req.params.id);
+  // console.log('what i get', req.params.id);
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
+app.post('/urls/:id/edit', (req, res) => {
+  // console.log('what i get', req.body);
+  urlDatabase[req.params.id] = req.body.newLongURL;
+  res.redirect('/urls');
+});
+
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
-
-
-
-
-
 
 
 app.listen(PORT, () => {
