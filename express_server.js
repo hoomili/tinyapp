@@ -47,10 +47,22 @@ app.post('/urls', (req, res) => {
   console.log(urlDatabase);
   res.redirect(`/urls/:${id}`);
 });
+app.post('/urls/:id/delete', (req, res) => {
+  console.log('what i get', req.params.id);
+  delete urlDatabase[req.params.id]
+  res.redirect('/urls');
+});
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
+
+
+
+
+
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
