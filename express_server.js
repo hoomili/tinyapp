@@ -13,7 +13,7 @@ const generateRandomString = () => {
   let randomString = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 7; i++) {
-    randomString += characters[Math.floor(Math.random()*characters.length)];
+    randomString += characters[Math.floor(Math.random() * characters.length)];
   }
   return randomString;
 };
@@ -42,9 +42,15 @@ app.get('/urls/:id', (req, res) => {
 
 app.post('/urls', (req, res) => {
   console.log(req.body);
-  res.send('ok');
+  let id = generateRandomString();
+  urlDatabase[id] = req.body.longURL;
+  console.log(urlDatabase);
+  res.redirect(`/urls/:${id}`);
 });
-
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+});
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
