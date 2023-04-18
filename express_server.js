@@ -45,11 +45,11 @@ app.post('/urls', (req, res) => {
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   console.log(urlDatabase);
-  res.redirect(`/urls/:${id}`);
+  res.redirect(`/urls/${id}`);
 });
 app.post('/urls/:id/delete', (req, res) => {
   console.log('what i get', req.params.id);
-  delete urlDatabase[req.params.id]
+  delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
 app.get("/u/:id", (req, res) => {
