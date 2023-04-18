@@ -9,7 +9,11 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const generateRandomString = () => {
+  
+}
 
+app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.send("Hello!");
 });
@@ -23,9 +27,17 @@ app.get('/urls', (req, res) => {
   const templateVar = { urls: urlDatabase };
   res.render("urls_index", templateVar);
 });
+app.get('/urls/new', (req, res) => {
+  res.render("urls_new");
+});
 app.get('/urls/:id', (req, res) => {
   const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVar);
+});
+
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  res.send('ok');
 });
 
 app.listen(PORT, () => {
