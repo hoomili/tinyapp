@@ -97,7 +97,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-// render the login page
+// render the registration page
 app.get('/register', (req, res) => {
   const templateVar = {
     urls: urlDatabase,
@@ -105,6 +105,17 @@ app.get('/register', (req, res) => {
   };
   res.render('user_registration', templateVar);
 });
+
+// render the login page
+app.get('/login', (req, res) => {
+  const templateVar = {
+    urls: urlDatabase,
+    user: users[req.cookies['user_id']]
+  };
+  res.render('user_login', templateVar);
+});
+
+
 
 app.post('/urls/:id', (req, res) => {
   // const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
@@ -136,7 +147,7 @@ app.post('/urls/:id/edit', (req, res) => {
 
 // creates a username login for the user
 app.post('/login', (req, res) => {
-  res.redirect('/register');
+  res.redirect('/login');
 });
 
 // logout of current username and clear the cookie
