@@ -21,6 +21,7 @@ const generateRandomString = () => {
 };
 
 
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 
