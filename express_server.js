@@ -99,13 +99,17 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-
+// creates a username login for the user
 app.post('/login', (req, res) => {
-  
   res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
 
+// logout of current username and clear the cookie
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
