@@ -34,7 +34,18 @@ const generateRandomString = () => {
   return randomString;
 };
 
-
+// this function checks if the user already exist or not
+const userLookup = (email, object) => {
+  for (const key in object) {
+    // console.log('current email of the object', object[key].email);
+    // console.log('email sent', email);
+    // console.log('current key', key);
+    if (object[key].email === email) {
+      return object[key];
+    }
+  }
+  return null;
+};
 
 app.set('view engine', 'ejs');
 app.use(cookieParser());
@@ -143,6 +154,9 @@ app.post('/register', (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Please provide email address and password');
   }
+  if (userLookup(email, users)) {
+    return res.status(400).send('User with this email address already exists please try a new email');
+  }
   console.log('email', email, 'password', password);
   users[id] = {
     id,
@@ -150,6 +164,8 @@ app.post('/register', (req, res) => {
     password
   };
   console.log(users[id]);
+  console.log(users);
+  
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
