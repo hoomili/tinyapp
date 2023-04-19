@@ -35,6 +35,7 @@ const generateRandomString = () => {
 };
 
 
+
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -58,14 +59,14 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVar = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    user: users[req.cookies['user_id']]
   };
   res.render("urls_index", templateVar);
 });
 
 // show the new url page that was created
 app.get('/urls/new', (req, res) => {
-  const templateVar = { username: req.cookies['username'] };
+  const templateVar = { user: users[req.cookies['user_id']] };
   res.render("urls_new", templateVar);
 });
 
@@ -74,7 +75,7 @@ app.get('/urls/:id', (req, res) => {
   const templateVar = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies['username']
+    user: users[req.cookies['user_id']]
   };
   res.render("urls_show", templateVar);
 });
@@ -89,7 +90,7 @@ app.get("/u/:id", (req, res) => {
 app.get('/register', (req, res) => {
   const templateVar = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    user: users[req.cookies['user_id']]
   };
   res.render('user_registration', templateVar);
 });
@@ -124,16 +125,34 @@ app.post('/urls/:id/edit', (req, res) => {
 
 // creates a username login for the user
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  res.redirect('/register');
 });
 
 // logout of current username and clear the cookie
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
+// register the new user with their email and password and generated id
+app.post('/register', (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send('Please provide email address and password');
+  }
+  console.log('email', email, 'password', password);
+  users[id] = {
+    id,
+    email,
+    password
+  };
+  console.log(users[id]);
+  res.cookie('user_id', id);
+  res.redirect('/urls');
+});
 
 
 app.listen(PORT, () => {
