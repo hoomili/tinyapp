@@ -145,15 +145,28 @@ app.post('/urls/:id/edit', (req, res) => {
   res.redirect('/urls');
 });
 
-// creates a username login for the user
+// logs the user in
 app.post('/login', (req, res) => {
-  res.redirect('/login');
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
+    return res.status(400).send('Please provide email address and password');
+  }
+  const user = userLookup(email, users);
+  if (!user) {
+    return res.status(403).send('Incorrect email address');
+  }
+  if (user.password !== password) {
+    return res.status(403).send('Incorrect password');
+  }
+  res.cookie('user_id', user.id);
+  res.redirect('/urls');
 });
 
-// logout of current username and clear the cookie
+// logout of current user and clear the cookie
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 // register the new user with their email and password and generated id
@@ -168,14 +181,13 @@ app.post('/register', (req, res) => {
   if (userLookup(email, users)) {
     return res.status(400).send('User with this email address already exists please try a new email');
   }
-  console.log('email', email, 'password', password);
+
   users[id] = {
     id,
     email,
     password
   };
-  console.log(users[id]);
-  console.log(users);
+
   
   res.cookie('user_id', id);
   res.redirect('/urls');
