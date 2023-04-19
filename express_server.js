@@ -9,6 +9,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// the function below makes a random string that has a length of 6 characters
 const generateRandomString = () => {
   let randomString = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,33 +19,48 @@ const generateRandomString = () => {
   return randomString;
 };
 
+
 app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
   res.send("Hello!");
 });
+
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+
 app.get('/hello', (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+
 app.get('/urls', (req, res) => {
   const templateVar = { urls: urlDatabase };
   res.render("urls_index", templateVar);
 });
+
+
 app.get('/urls/new', (req, res) => {
   res.render("urls_new");
 });
+
+
 app.get('/urls/:id', (req, res) => {
   const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVar);
 });
+
+
 app.post('/urls/:id', (req, res) => {
   // const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.redirect(`/urls/${req.params.id}`);
 });
+
+// create a new short url for a given long url
 app.post('/urls', (req, res) => {
   // console.log(req.body);
   let id = generateRandomString();
@@ -52,25 +68,34 @@ app.post('/urls', (req, res) => {
   // console.log(urlDatabase);
   res.redirect(`/urls/${id}`);
 });
+
+// deletes the url requested by the user
 app.post('/urls/:id/delete', (req, res) => {
   // console.log('what i get', req.params.id);
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
+
+// edit the previouse long urls
 app.post('/urls/:id/edit', (req, res) => {
   // console.log('what i get', req.body);
   urlDatabase[req.params.id] = req.body.newLongURL;
   res.redirect('/urls');
 });
+
+// redirect the short url to the actual website
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
+
+
 app.post('/login', (req, res) => {
   
   res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
