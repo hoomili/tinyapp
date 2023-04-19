@@ -19,6 +19,8 @@ const generateRandomString = () => {
 };
 
 app.use(express.urlencoded({ extended: true }));
+
+
 app.get('/', (req, res) => {
   res.send("Hello!");
 });
@@ -43,9 +45,8 @@ app.post('/urls/:id', (req, res) => {
   // const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.redirect(`/urls/${req.params.id}`);
 });
-
 app.post('/urls', (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   // console.log(urlDatabase);
@@ -61,12 +62,15 @@ app.post('/urls/:id/edit', (req, res) => {
   urlDatabase[req.params.id] = req.body.newLongURL;
   res.redirect('/urls');
 });
-
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
-
+app.post('/login', (req, res) => {
+  
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
