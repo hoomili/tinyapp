@@ -24,13 +24,19 @@
       <form action="/logout" method="POST">
         <button type="submit" class="btn btn-outline-dark">Logout</button>
       </form>
-    <% } else { %> 
-      <form action="/login" method="GET">
+    <% } else { %>
+      <div id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/login">Login</a>
+          <a class="nav-item nav-link" href="/register">Register</a>
+        </div>
+      </div>
+      <!-- <form action="/login" method="GET">
         <button type="submit" class="btn btn-outline-dark" style="margin-right: 1em;">Login</button>
       </form>
       <form action="/register" method="GET">
         <button type="submit" class="btn btn-outline-dark" style="margin-right: 1em;">Register</button>
-      </form>
+      </form> -->
     <% } %>
   </nav>
 </header>
