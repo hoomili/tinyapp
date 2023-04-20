@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { userLookup } = require('./helpers.js');
+const { userLookup, generateRandomString } = require('./helpers.js');
 const PORT = 8080;
 
 const urlDatabase = {
@@ -19,16 +19,6 @@ const urlDatabase = {
 
 // user database
 const users = {};
-
-// the function below makes a random string that has a length of 6 characters
-const generateRandomString = () => {
-  let randomString = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
-    randomString += characters[Math.floor(Math.random() * characters.length)];
-  }
-  return randomString;
-};
 
 const urlsForUser = (id) => {
   let userUrls = {};
