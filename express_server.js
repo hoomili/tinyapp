@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
+const cookieSession = require('cookie-session');
 const PORT = 8080;
 
 const urlDatabase = {
@@ -64,6 +65,11 @@ app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use(cookieSession({
+  name: 'session',
+  keys: [/* secret keys */],
+}));
+
 
 app.get('/', (req, res) => {
   res.send("Hello!");
