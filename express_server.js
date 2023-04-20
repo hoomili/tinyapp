@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
@@ -18,18 +17,7 @@ const urlDatabase = {
 };
 
 // user database
-const users = {
-  aJ48lW: {
-    id: "aJ48lW",
-    email: "user@example.com",
-    password: "1234",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "456",
-  },
-};
+const users = {};
 
 // the function below makes a random string that has a length of 6 characters
 const generateRandomString = () => {
@@ -62,12 +50,11 @@ const urlsForUser = (id) => {
 };
 
 app.set('view engine', 'ejs');
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(cookieSession({
   name: 'session',
-  keys: [/* secret keys */],
+  keys: [generateRandomString()],
 }));
 
 
@@ -88,10 +75,10 @@ app.get('/hello', (req, res) => {
 // render the urls page
 app.get('/urls', (req, res) => {
   const templateVar = {
-    urls: urlsForUser(req.cookies['user_id']),
-    user: users[req.cookies['user_id']]
+    urls: urlsForUser(req.session.userId),
+    user: users[req.session.userId]
   };
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.redirect('/login');
     return;
   }
@@ -100,11 +87,11 @@ app.get('/urls', (req, res) => {
 
 // show the new url page that was created
 app.get('/urls/new', (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.redirect('/login');
     return;
   }
-  const templateVar = { user: users[req.cookies['user_id']] };
+  const templateVar = { user: users[req.session.userId] };
   res.render("urls_new", templateVar);
 });
 
@@ -114,18 +101,18 @@ app.get('/urls/:id', (req, res) => {
     res.status(404).send('The shortened url does not exist');
     return;
   }
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.status(403).send('Please login first to access this feature');
     return;
   }
-  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+  if (req.session.userId !== urlDatabase[req.params.id].userID) {
     res.status(403).send('This link does not belog to this user');
     return;
   }
   const templateVar = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies['user_id']]
+    user: users[req.session.userId]
   };
   res.render("urls_show", templateVar);
 });
@@ -144,9 +131,9 @@ app.get("/u/:id", (req, res) => {
 app.get('/register', (req, res) => {
   const templateVar = {
     urls: urlDatabase,
-    user: users[req.cookies['user_id']]
+    user: users[req.session.userId]
   };
-  if (req.cookies['user_id']) {
+  if (req.session.userId) {
     res.redirect('/urls');
     return;
   }
@@ -157,9 +144,9 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
   const templateVar = {
     urls: urlDatabase,
-    user: users[req.cookies['user_id']]
+    user: users[req.session.userId]
   };
-  if (req.cookies['user_id']) {
+  if (req.session.userId) {
     res.redirect('/urls');
     return;
   }
@@ -169,7 +156,7 @@ app.get('/login', (req, res) => {
 
 
 app.post('/urls/:id', (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.status(403).send('Please login first to access this feature');
     return;
   }
@@ -179,7 +166,7 @@ app.post('/urls/:id', (req, res) => {
     return;
   }
 
-  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+  if (req.session.userId !== urlDatabase[req.params.id].userID) {
     res.status(403).send('This link does not belog to this user');
     return;
   }
@@ -188,25 +175,25 @@ app.post('/urls/:id', (req, res) => {
 
 // create a new short url for a given long url
 app.post('/urls', (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.status(403).send('Please login first to access this feature');
     return;
   }
   let id = generateRandomString();
-  urlDatabase[id] = { longURL: req.body.longURL, userID: req.cookies['user_id'] };
+  urlDatabase[id] = { longURL: req.body.longURL, userID: req.session.userId };
   res.redirect(`/urls/${id}`);
 });
 
 // deletes the url requested by the user
 app.post('/urls/:id/delete', (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session.userId) {
     res.status(403).send('Please login first to access this feature');
     return;
   }
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The requested id to delete does not exist');
   }
-  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+  if (req.session.userId !== urlDatabase[req.params.id].userID) {
     res.status(403).send('This link does not belog to this user');
   }
   delete urlDatabase[req.params.id];
@@ -230,18 +217,17 @@ app.post('/login', (req, res) => {
   if (!user) {
     return res.status(403).send('Incorrect email address');
   }
-  console.log(password, user.password);
-  console.log('what do i get', bcrypt.compareSync(password, user.password));
+
   if (!bcrypt.compareSync(password, user.password)) {
     return res.status(403).send('Incorrect password');
   }
-  res.cookie('user_id', user.id);
+  req.session.userId = user.id;
   res.redirect('/urls');
 });
 
 // logout of current user and clear the cookie
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/login');
 });
 
@@ -265,7 +251,7 @@ app.post('/register', (req, res) => {
   };
 
   console.log(users);
-  res.cookie('user_id', id);
+  req.session.userId = id;
   res.redirect('/urls');
 });
 
