@@ -5,9 +5,20 @@ const morgan = require('morgan');
 const PORT = 8080;
 
 
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // user database
@@ -96,7 +107,7 @@ app.get('/urls/:id', (req, res) => {
   }
   const templateVar = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies['user_id']]
   };
   res.render("urls_show", templateVar);
@@ -107,7 +118,7 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The shortened url does not exist');
   }
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
 
@@ -152,7 +163,7 @@ app.post('/urls', (req, res) => {
     return;
   }
   let id = generateRandomString();
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id] = { longURL: req.body.longURL };
   // console.log(urlDatabase);
   res.redirect(`/urls/${id}`);
 });
@@ -167,7 +178,7 @@ app.post('/urls/:id/delete', (req, res) => {
 // edit the previouse long urls
 app.post('/urls/:id/edit', (req, res) => {
   // console.log('what i get', req.body);
-  urlDatabase[req.params.id] = req.body.newLongURL;
+  urlDatabase[req.params.id].longURL = req.body.newLongURL;
   res.redirect('/urls');
 });
 
