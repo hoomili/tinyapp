@@ -3,6 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
+const { userLookup } = require('./helper.js');
 const PORT = 8080;
 
 const urlDatabase = {
@@ -30,14 +31,14 @@ const generateRandomString = () => {
 };
 
 // this function checks if the user already exist or not
-const userLookup = (email, object) => {
-  for (const key in object) {
-    if (object[key].email === email) {
-      return object[key];
-    }
-  }
-  return null;
-};
+// const userLookup = (email, object) => {
+//   for (const key in object) {
+//     if (object[key].email === email) {
+//       return object[key];
+//     }
+//   }
+//   return null;
+// };
 
 const urlsForUser = (id) => {
   let userUrls = {};
