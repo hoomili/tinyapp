@@ -133,7 +133,10 @@ app.post('/urls/:id', (req, res) => {
 // create a new short url for a given long url
 app.post('/urls', (req, res) => {
   // console.log(req.body);
-
+  if (!req.cookies['user_id']) {
+    res.status(403).send('Please login first to access this feature');
+    return;
+  }
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   // console.log(urlDatabase);
