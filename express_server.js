@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
 const urlDatabase = {
