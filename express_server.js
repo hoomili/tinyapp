@@ -167,7 +167,7 @@ app.post('/urls/:id', (req, res) => {
     res.status(403).send('Please login first to access this feature');
     return;
   }
-  console.log('what do i get', req.params.id)
+  console.log('what do i get', req.params.id);
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The requested id to access does not exist');
     return;
@@ -224,7 +224,9 @@ app.post('/login', (req, res) => {
   if (!user) {
     return res.status(403).send('Incorrect email address');
   }
-  if (user.password !== password) {
+  console.log(password, user.password);
+  console.log('what do i get', bcrypt.compareSync(password, user.password));
+  if (!bcrypt.compareSync(password, user.password)) {
     return res.status(403).send('Incorrect password');
   }
   res.cookie('user_id', user.id);
@@ -241,7 +243,7 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
+  const password = bcrypt.hashSync(req.body.password, 10);
 
   if (!email || !password) {
     return res.status(400).send('Please provide email address and password');
@@ -256,7 +258,7 @@ app.post('/register', (req, res) => {
     password
   };
 
-  
+  console.log(users);
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
