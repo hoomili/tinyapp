@@ -23,8 +23,8 @@ const urlDatabase = {
 
 // user database
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
@@ -58,6 +58,18 @@ const userLookup = (email, object) => {
   return null;
 };
 
+const urlsForUser = (id) => {
+  let userUrls = {};
+  for (const key in urlDatabase) {
+    console.log(key);
+    if (urlDatabase[key].userID === id) {
+      userUrls[key] = urlDatabase[key];
+      console.log(userUrls);
+    }
+  }
+  return userUrls;
+};
+
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -80,9 +92,12 @@ app.get('/hello', (req, res) => {
 // render the urls page
 app.get('/urls', (req, res) => {
   const templateVar = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies['user_id']),
     user: users[req.cookies['user_id']]
   };
+  console.log('user urls', templateVar.urls);
+  console.log('user id', req.cookies['user_id']);
+  console.log(urlsForUser(req.cookies['user_id']));
   if (!req.cookies['user_id']) {
     res.redirect('/login');
     return;
@@ -104,6 +119,9 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The shortened url does not exist');
+  }
+  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+    res.status(403).send('This link does not belog to this user');
   }
   const templateVar = {
     id: req.params.id,
