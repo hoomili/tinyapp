@@ -77,6 +77,10 @@ app.get('/urls', (req, res) => {
 
 // show the new url page that was created
 app.get('/urls/new', (req, res) => {
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+    return;
+  }
   const templateVar = { user: users[req.cookies['user_id']] };
   res.render("urls_new", templateVar);
 });
