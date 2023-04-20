@@ -87,7 +87,9 @@ app.get('/urls/new', (req, res) => {
 
 
 app.get('/urls/:id', (req, res) => {
-  
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send('The shortened url does not exist');
+  }
   const templateVar = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
