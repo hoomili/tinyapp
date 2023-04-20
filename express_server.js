@@ -87,6 +87,7 @@ app.get('/urls/new', (req, res) => {
 
 
 app.get('/urls/:id', (req, res) => {
+  
   const templateVar = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
@@ -97,6 +98,9 @@ app.get('/urls/:id', (req, res) => {
 
 // redirect the short url to the actual website
 app.get("/u/:id", (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send('The shortened url does not exist');
+  }
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
