@@ -103,6 +103,10 @@ app.get('/register', (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+    return;
+  }
   res.render('user_registration', templateVar);
 });
 
@@ -112,6 +116,10 @@ app.get('/login', (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+    return;
+  }
   res.render('user_login', templateVar);
 });
 
@@ -125,6 +133,7 @@ app.post('/urls/:id', (req, res) => {
 // create a new short url for a given long url
 app.post('/urls', (req, res) => {
   // console.log(req.body);
+
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   // console.log(urlDatabase);
