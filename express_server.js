@@ -4,12 +4,6 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const PORT = 8080;
 
-
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
-
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -26,12 +20,12 @@ const users = {
   aJ48lW: {
     id: "aJ48lW",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "1234",
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: "456",
   },
 };
 
@@ -48,9 +42,6 @@ const generateRandomString = () => {
 // this function checks if the user already exist or not
 const userLookup = (email, object) => {
   for (const key in object) {
-    // console.log('current email of the object', object[key].email);
-    // console.log('email sent', email);
-    // console.log('current key', key);
     if (object[key].email === email) {
       return object[key];
     }
@@ -61,10 +52,8 @@ const userLookup = (email, object) => {
 const urlsForUser = (id) => {
   let userUrls = {};
   for (const key in urlDatabase) {
-    console.log(key);
     if (urlDatabase[key].userID === id) {
       userUrls[key] = urlDatabase[key];
-      console.log(userUrls);
     }
   }
   return userUrls;
@@ -95,9 +84,6 @@ app.get('/urls', (req, res) => {
     urls: urlsForUser(req.cookies['user_id']),
     user: users[req.cookies['user_id']]
   };
-  console.log('user urls', templateVar.urls);
-  console.log('user id', req.cookies['user_id']);
-  console.log(urlsForUser(req.cookies['user_id']));
   if (!req.cookies['user_id']) {
     res.redirect('/login');
     return;
@@ -119,9 +105,15 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The shortened url does not exist');
+    return;
+  }
+  if (!req.cookies['user_id']) {
+    res.status(403).send('Please login first to access this feature');
+    return;
   }
   if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
     res.status(403).send('This link does not belog to this user');
+    return;
   }
   const templateVar = {
     id: req.params.id,
@@ -135,6 +127,7 @@ app.get('/urls/:id', (req, res) => {
 app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The shortened url does not exist');
+    return;
   }
   const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
@@ -169,33 +162,52 @@ app.get('/login', (req, res) => {
 
 
 app.post('/urls/:id', (req, res) => {
-  // const templateVar = { id: req.params.id, longURL: urlDatabase[req.params.id]};
+  if (!req.cookies['user_id']) {
+    res.status(403).send('Please login first to access this feature');
+    return;
+  }
+  console.log('what do i get', req.params.id)
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send('The requested id to access does not exist');
+    return;
+  }
+
+  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+    res.status(403).send('This link does not belog to this user');
+    return;
+  }
   res.redirect(`/urls/${req.params.id}`);
 });
 
 // create a new short url for a given long url
 app.post('/urls', (req, res) => {
-  // console.log(req.body);
   if (!req.cookies['user_id']) {
     res.status(403).send('Please login first to access this feature');
     return;
   }
   let id = generateRandomString();
-  urlDatabase[id] = { longURL: req.body.longURL };
-  // console.log(urlDatabase);
+  urlDatabase[id] = { longURL: req.body.longURL, userID: req.cookies['user_id'] };
   res.redirect(`/urls/${id}`);
 });
 
 // deletes the url requested by the user
 app.post('/urls/:id/delete', (req, res) => {
-  // console.log('what i get', req.params.id);
+  if (!req.cookies['user_id']) {
+    res.status(403).send('Please login first to access this feature');
+    return;
+  }
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send('The requested id to delete does not exist');
+  }
+  if (req.cookies['user_id'] !== urlDatabase[req.params.id].userID) {
+    res.status(403).send('This link does not belog to this user');
+  }
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
 
 // edit the previouse long urls
 app.post('/urls/:id/edit', (req, res) => {
-  // console.log('what i get', req.body);
   urlDatabase[req.params.id].longURL = req.body.newLongURL;
   res.redirect('/urls');
 });
