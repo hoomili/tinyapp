@@ -72,6 +72,10 @@ app.get('/urls', (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+    return;
+  }
   res.render("urls_index", templateVar);
 });
 
@@ -85,7 +89,7 @@ app.get('/urls/new', (req, res) => {
   res.render("urls_new", templateVar);
 });
 
-
+// render the page for each short url
 app.get('/urls/:id', (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The shortened url does not exist');
