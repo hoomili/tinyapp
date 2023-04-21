@@ -141,7 +141,6 @@ app.post('/urls/:id', (req, res) => {
     res.status(403).send('Please login first to access this feature');
     return;
   }
-  console.log('what do i get', req.params.id);
   if (!urlDatabase[req.params.id]) {
     res.status(404).send('The requested id to access does not exist');
     return;
@@ -230,8 +229,6 @@ app.post('/register', (req, res) => {
     email,
     password
   };
-
-  console.log(users);
   req.session.userId = id;
   res.redirect('/urls');
 });
