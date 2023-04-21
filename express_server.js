@@ -40,7 +40,11 @@ app.use(cookieSession({
 
 
 app.get('/', (req, res) => {
-  res.send("Hello!");
+  if (!req.session.userId) {
+    res.redirect('/login');
+    return;
+  }
+  res.redirect('/urls');
 });
 
 
@@ -60,7 +64,7 @@ app.get('/urls', (req, res) => {
     user: users[req.session.userId]
   };
   if (!req.session.userId) {
-    res.redirect('/login');
+    res.status(401).send('Please login to access the urls page');
     return;
   }
   res.render("urls_index", templateVar);
@@ -135,7 +139,7 @@ app.get('/login', (req, res) => {
 });
 
 
-
+// goes to the short url page to access edit and redirect feature
 app.post('/urls/:id', (req, res) => {
   if (!req.session.userId) {
     res.status(403).send('Please login first to access this feature');
