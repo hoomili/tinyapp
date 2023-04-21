@@ -15,8 +15,9 @@ Furthermore, the application uses encrypted cookies to stop access from unathori
 
 ## Final Product
 
-![image.png](#)
-!["screenshot description"](#)
+![Screenshot of url page](https://github.com/hoomili/tinyapp/blob/master/docs/urls-page.png?raw=true)
+!["screenshot of new url creation page"](https://github.com/hoomili/tinyapp/blob/master/docs/new-url-page.png?raw=true)
+!["screenshot of new url edit page"](https://github.com/hoomili/tinyapp/blob/master/docs/edit-url-page.png?raw=true)
 
 ## Dependencies
 
